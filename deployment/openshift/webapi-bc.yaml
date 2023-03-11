@@ -1,0 +1,46 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: web-api
+  annotations:
+    description: ""
+    tags: web-api
+objects:
+-
+  apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: web-api
+    labels:
+      app: web-api
+  spec:
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+    runPolicy: Serial
+    source:
+      contextDir: /api
+      git:
+        ref: main
+        uri: https://github.com/TwinkleJoseph/EcoCoachToursBoatManagementApp.git
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'web-api:latest'    
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: Dockerfile 
+    triggers:
+      - type: ImageChange
+        imageChange: {}
+      - type: ConfigChange           
+- 
+  apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: web-api      

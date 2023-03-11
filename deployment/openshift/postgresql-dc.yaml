@@ -56,18 +56,18 @@ objects:
           - name: POSTGRESQL_USER
             valueFrom:
               secretKeyRef:
-                key: database-user
-                name: postgresql
+                key: DATABASE_USER
+                name: "${NAME}-${TAG_NAME}-secret"
           - name: POSTGRESQL_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: database-password
-                name: postgresql
+                key: DATABASE_PASSWORD
+                name: "${NAME}-${TAG_NAME}-secret"
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
-                key: database-name
-                name: postgresql          
+                key: DATABASE_NAME
+                name: "${NAME}-${TAG_NAME}-secret"          
           resources:
             limits:
               memory: 512Mi          
@@ -116,31 +116,39 @@ objects:
     - ReadWriteOnce
     resources:
       requests:
-        storage: "${PERSISTENT_VOLUME_SIZE}"        
-  status:
-    availableReplicas: 1
-    conditions:
-      - lastTransitionTime: '2023-03-11T03:31:54Z'
-        lastUpdateTime: '2023-03-11T03:31:54Z'
-        message: Deployment config has minimum availability.
-        status: 'True'
-        type: Available
-      - lastTransitionTime: '2023-03-11T03:31:55Z'
-        lastUpdateTime: '2023-03-11T03:31:55Z'
-        message: replication controller "postgresql-1" successfully rolled out
-        reason: NewReplicationControllerAvailable
-        status: 'True'
-        type: Progressing
-    details:
-      causes:
-        - type: ConfigChange
-      message: config change
-    latestVersion: 1
-    observedGeneration: 2
-    readyReplicas: 1
-    replicas: 1
-    unavailableReplicas: 0
-    updatedReplicas: 1
+        storage: "${PERSISTENT_VOLUME_SIZE}"
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-${TAG_NAME}-secret"
+    labels:
+      app: "${NAME}-${TAG_NAME}"
+      template: "${NAME}-deploy"
+  stringData:
+    DATABASE_USER: "${POSTGRESQL_USER}"
+    DATABASE_PASSWORD: "${POSTGRESQL_PASSWORD}"
+    DATABASE_ADMIN_PASSWORD: "${POSTGRESQL_ADMIN_PASSWORD}"
+    DATABASE_NAME: "${POSTGRESQL_DATABASE_NAME}"
+  type: Opaque 
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-${TAG_NAME}"
+    labels:
+      app: "${NAME}-${TAG_NAME}"
+      template: "${NAME}-deploy"
+    annotations:
+      template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}
+  spec:
+    ports:
+    - name: "${NAME}-${TAG_NAME}"
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+    selector:
+      name: "${NAME}-${TAG_NAME}"
+    type: ClusterIP
+    sessionAffinity: None         
 parameters:
 - name: NAME
   displayName: Name
@@ -162,4 +170,26 @@ parameters:
   displayName: Persistent Volume Class name
   description: The class of the volume; gluster-file, gluster-block, gluster-file-db.
   required: false
-  value: netapp-file-standard     
+  value: netapp-file-standard
+- name: POSTGRESQL_PASSWORD
+  displayName: PostgreSQL Connection Password
+  description: Password for the PostgreSQL connection user.  Needs to be basee64 encoded/
+  required: true
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"
+- name: POSTGRESQL_ADMIN_PASSWORD
+  displayName: PostgreSQL Connection Admin Password
+  description: Password for the PostgreSQL connection user.  Needs to be basee64 encoded/
+  required: true
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"   
+- name: POSTGRESQL_DATABASE_NAME
+  displayName: Database Name
+  description: A valid database name used by the service.
+  required: true
+  value: postgres 
+- name: POSTGRESQL_USER
+  displayName: Database User
+  description: A valid database user used by the service.
+  required: true
+  value: postgres       

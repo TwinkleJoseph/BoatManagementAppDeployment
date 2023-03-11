@@ -27,13 +27,11 @@ objects:
         imageChangeParams:
           automatic: true
           containerNames:
-            - postgresql
+          - "${NAME}-${TAG_NAME}"
           from:
             kind: ImageStreamTag
-            name: 'postgresql:9.6'
+            name: 'postgresql:10'
             namespace: openshift
-          lastTriggeredImage: >-
-            172.30.1.1:5000/openshift/postgresql@sha256:b681d78125361519180a6ac05242c296f8906c11eab7e207b5ca9a89b6344392
       - type: ConfigChange  
     replicas: 1
     test: false
@@ -45,68 +43,80 @@ objects:
           name: "${NAME}-${TAG_NAME}"
       spec:
         volumes:
-          - name: postgresql-data
-            persistentVolumeClaim:
-              claimName: postgresql
+        - name: "${NAME}-data"
+          persistentVolumeClaim:
+            claimName: "${NAME}-${TAG_NAME}"
         containers:
-          - env:
-              - name: POSTGRESQL_USER
-                valueFrom:
-                  secretKeyRef:
-                    key: database-user
-                    name: postgresql
-              - name: POSTGRESQL_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    key: database-password
-                    name: postgresql
-              - name: POSTGRESQL_DATABASE
-                valueFrom:
-                  secretKeyRef:
-                    key: database-name
-                    name: postgresql
-            image:  postgresql:latest
-            imagePullPolicy: IfNotPresent
-            livenessProbe:
-              exec:
-                command:
-                  - /usr/libexec/check-container
-                  - '--live'
-              failureThreshold: 3
-              initialDelaySeconds: 120
-              periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 10
-            name: postgresql
-            ports:
-              - containerPort: 5432
-                protocol: TCP
-            readinessProbe:
-              exec:
-                command:
-                  - /usr/libexec/check-container
-              failureThreshold: 3
-              initialDelaySeconds: 5
-              periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 1
-            resources:
-              limits:
-                memory: 512Mi
-            securityContext:
-              capabilities: {}
-              privileged: false
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            volumeMounts:
-              - mountPath: /var/lib/pgsql/data
-                name: postgresql-data
+        - name: "${NAME}-${TAG_NAME}"
+          image:  " "         
+          ports:
+            - containerPort: 5432
+              protocol: TCP          
+          env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: postgresql
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: postgresql
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: postgresql          
+          resources:
+            limits:
+              memory: 512Mi          
+          volumeMounts:
+            - mountPath: /var/lib/pgsql/data
+              name: "${NAME}-data"   
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - '--live'          
+          readinessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container            
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File                   
+          imagePullPolicy: IfNotPresent          
+          failureThreshold: 3
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+          securityContext:
+            capabilities: {}
+            privileged: false
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        schedulerName: default-scheduler
         securityContext: {}
-        terminationGracePeriodSeconds: 30
-        
+        terminationGracePeriodSeconds: 30        
+        schedulerName: default-scheduler
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-${TAG_NAME}"
+    labels:
+      app: "${NAME}-${TAG_NAME}"
+      template: "${NAME}-deploy"
+  spec:
+    #storageClassName: "${PERSISTENT_VOLUME_CLASS}"
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${PERSISTENT_VOLUME_SIZE}"        
   status:
     availableReplicas: 1
     conditions:
@@ -142,4 +152,14 @@ parameters:
   displayName: Environment TAG name
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
-  value: dev    
+  value: dev
+- name: PERSISTENT_VOLUME_SIZE
+  displayName: Persistent Volume Size
+  description: The size of the persistent volume , e.g. 512Mi, 1Gi, 2Gi.
+  required: true
+  value: 1Gi
+- name: PERSISTENT_VOLUME_CLASS
+  displayName: Persistent Volume Class name
+  description: The class of the volume; gluster-file, gluster-block, gluster-file-db.
+  required: false
+  value: netapp-file-standard     

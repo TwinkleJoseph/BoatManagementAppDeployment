@@ -19,7 +19,7 @@ objects:
     replicas: 1
     revisionHistoryLimit: 10
     selector:
-      name: postgresql
+      name: "${NAME}-${TAG_NAME}"
     strategy:      
       type: Recreate
       activeDeadlineSeconds: 21600
@@ -30,7 +30,7 @@ objects:
       metadata:
         creationTimestamp: null
         labels:
-          name: postgresql
+          name: "${NAME}-${TAG_NAME}"
       spec:
         containers:
           - env:

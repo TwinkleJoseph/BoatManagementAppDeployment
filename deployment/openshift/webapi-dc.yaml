@@ -23,11 +23,65 @@ objects:
         intervalSeconds: 1
         timeoutSeconds: 600
         maxUnavailable: 25%
-        maxSurge: 25%    
+        maxSurge: 25%
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${NAME}
+      spec:
+        containers:
+        - env:
+          - name: DB_HOST
+            value: "${DB_RESOURCE_NAME}-${TAG_NAME}"
+          - name: DB_PORT
+            value: ${DATABASE_PORT}            
+          - name: DB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: DATABASE_NAME  
+                name: "${DB_RESOURCE_NAME}-${TAG_NAME}-secret"
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: DATABASE_USER  
+                name: "${DB_RESOURCE_NAME}-${TAG_NAME}-secret" 
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DATABASE_PASSWORD  
+                name: "${DB_RESOURCE_NAME}-${TAG_NAME}-secret"            
+          image: ${IMAGE_REGISTRY_HOST}:5000/${IMAGE_NAMESPACE}/${NAME}:${IMAGE_TAG}
+          imagePullPolicy: Always  
+          name: ${NAME}      
 parameters:
 - name: NAME
   displayName: Name
   description: The name assigned to all of the OpenShift resources associated to the
     server instance.
   required: true
-  value: web-api    
+  value: web-api
+- name: TAG_NAME
+  description: The image tag name to pull for the deployment.
+  required: true 
+  value: dev 
+- name: IMAGE_REGISTRY_HOST
+  description: The image tag name to pull for the deployment.
+  required: true 
+  value: 172.30.1.1    
+- name: IMAGE_NAMESPACE
+  description: The location for your image streams (Tools Workspace).
+  required: true  
+  value: myproject
+- name: IMAGE_TAG
+  description: The image tag to pull for the deployment.
+  required: true  
+  value: latest 
+- name: DB_RESOURCE_NAME
+  description: The port that the database is running on.
+  required: true
+  value: "postgresql-db"     
+- name: DATABASE_PORT
+  description: The port that the database is running on.
+  required: true
+  value: "5432"  

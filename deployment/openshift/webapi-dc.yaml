@@ -3,8 +3,31 @@ kind: Template
 metadata:
   name: web-api
 objects:
-- 
-  apiVersion: apps.openshift.io/v1
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${NAME}
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    ports:
+      - name: web-api
+        port: 5000
+        targetPort: 5000
+    selector:
+      app: ${NAME}
+- apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     annotations:
@@ -114,3 +137,7 @@ parameters:
   description: The port that the database is running on.
   required: true
   value: "5432"  
+- name: WEBAPI_URL
+  description: The public URL that the API is exposed on.
+  required: true
+  value: my-route-my-project.127.0.0.1.nip.io  

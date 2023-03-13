@@ -75,7 +75,14 @@ objects:
               memory: 4Gi
             requests:
               cpu: 1
-              memory: 2Gi       
+              memory: 2Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File 
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30            
 parameters:
 - name: NAME
   displayName: Name

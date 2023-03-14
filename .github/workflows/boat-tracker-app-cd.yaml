@@ -18,4 +18,9 @@ jobs:
       - name: Login Openshift
         shell: bash
         run: |
-          oc login --server=${{secrets.OPENSHIFT_SERVER}} --token=${{secrets.OPENSHIFT_TOKEN}} --insecure-skip-tls-verify  
+          oc login --server=${{secrets.OPENSHIFT_SERVER}} --token=${{secrets.OPENSHIFT_TOKEN}} --insecure-skip-tls-verify
+      - name: Watch new rollout (trigger by image change in Openshift)
+        shell: bash
+        run: |
+          oc project myproject  
+          oc process -f postgresql-dc.yaml --param-file=${{secrets.OPENSHIFT_SERVER_ENV}}.env --ignore-unknown-parameters=true | oc apply -f -    

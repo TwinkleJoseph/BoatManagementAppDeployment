@@ -1,4 +1,4 @@
-name: Forms flow DEV CD
+name: Boat Tracker App Deployment
 
 on:
   workflow_dispatch:
@@ -14,3 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Login Openshift
+        shell: bash
+        run: |
+          oc login --server=${{secrets.OPENSHIFT_SERVER}} --token=${{secrets.OPENSHIFT_TOKEN}} --insecure-skip-tls-verify  

@@ -1,0 +1,121 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: boat-tracker-web
+objects:
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${NAME}
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    ports:
+      - name: boat-tracker-web
+        port: 3000
+        targetPort: 3000
+    selector:
+      app: ${NAME}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+    creationTimestamp: null
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${NAME}
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${NAME}
+      spec:
+        volumes:
+        - name: "${NAME}-data"
+          persistentVolumeClaim:
+            claimName: "${NAME}-${TAG_NAME}"
+        containers:
+        - env:
+          - name: REACT_APP_API_URL
+            value: ${WEBAPI_URL}                 
+          image: ${IMAGE_REGISTRY_HOST}:5000/${IMAGE_NAMESPACE}/${NAME}:${IMAGE_TAG}
+          imagePullPolicy: Always  
+          name: ${NAME}
+          ports:
+            - containerPort: 3000
+              protocol: TCP 
+          resources: {}
+          tty: true
+          #volumeMounts:
+            #- mountPath: /react-web/
+              #name: "${NAME}-data" 
+        restartPolicy: Always
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-${TAG_NAME}"
+    labels:
+      app: "${NAME}-${TAG_NAME}"
+      template: "${NAME}-deploy"
+  spec:
+    #storageClassName: "${PERSISTENT_VOLUME_CLASS}"
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${PERSISTENT_VOLUME_SIZE}"                 
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the OpenShift resources associated to the
+    server instance.
+  required: true
+  value: boat-tracker-web
+- name: TAG_NAME
+  description: The image tag name to pull for the deployment.
+  required: true 
+  value: dev 
+- name: IMAGE_REGISTRY_HOST
+  description: The image tag name to pull for the deployment.
+  required: true 
+  value: 172.30.1.1    
+- name: IMAGE_NAMESPACE
+  description: The location for your image streams (Tools Workspace).
+  required: true  
+  value: myproject
+- name: IMAGE_TAG
+  description: The image tag to pull for the deployment.
+  required: true  
+  value: latest 
+- name: WEBAPI_URL
+  description: The public URL that the API is exposed on.
+  required: true
+  value: "http://web-api-myproject.172.26.10.84.nip.io"
+- name: PERSISTENT_VOLUME_SIZE
+  displayName: Persistent Volume Size
+  description: The size of the persistent volume , e.g. 512Mi, 1Gi, 2Gi.
+  required: true
+  value: 512Mi   

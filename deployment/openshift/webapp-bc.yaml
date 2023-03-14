@@ -1,0 +1,46 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: boat-tracker-web
+  annotations:
+    description: ""
+    tags: boat-tracker-web
+objects:
+-
+  apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: boat-tracker-web
+    labels:
+      app: boat-tracker-web
+  spec:
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: '1'
+        memory: 2Gi
+    runPolicy: Serial
+    source:
+      contextDir: /web
+      git:
+        ref: feature/openshift-deployment
+        uri: https://github.com/TwinkleJoseph/EcoCoachToursBoatManagementApp.git
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'boat-tracker-web:latest'    
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: Dockerfile 
+    triggers:
+      - type: ImageChange
+        imageChange: {}
+      - type: ConfigChange           
+- 
+  apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: boat-tracker-web      

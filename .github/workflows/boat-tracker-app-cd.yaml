@@ -30,4 +30,8 @@ jobs:
         shell: bash
         run: |
           oc project myproject  
-          oc process -f deployment/openshift/postgresql-dc.yaml --param-file=deployment/openshift/${{secrets.OPENSHIFT_SERVER_ENV}}.env --ignore-unknown-parameters=true | oc apply -f -    
+          oc process -f deployment/openshift/postgresql-dc.yaml --param-file=deployment/openshift/${{secrets.OPENSHIFT_SERVER_ENV}}.env --ignore-unknown-parameters=true | oc apply -f -
+          oc process -f deployment/openshift/webapi-bc.yaml | oc apply -f - 
+          oc process -f deployment/openshift/webapi-dc.yaml --param-file=deployment/openshift/${{secrets.OPENSHIFT_SERVER_ENV}}.env --ignore-unknown-parameters=true | oc apply -f -
+          oc process -f deployment/openshift/webapp-bc.yaml | oc apply -f -
+          oc process -f deployment/openshift/webapp-dc.yaml --param-file=deployment/openshift/${{secrets.OPENSHIFT_SERVER_ENV}}.env --ignore-unknown-parameters=true | oc apply -f -   

@@ -15,10 +15,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: List files in working directory
+        run: ls 
+
+      - name: print working directory
+        run: pwd
+
       - name: Login Openshift
         shell: bash
         run: |
           oc login --server=${{secrets.OPENSHIFT_SERVER}} --token=${{secrets.OPENSHIFT_TOKEN}} --insecure-skip-tls-verify
+      
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |

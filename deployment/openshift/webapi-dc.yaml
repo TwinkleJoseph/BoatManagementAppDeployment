@@ -115,12 +115,10 @@ parameters:
   value: web-api
 - name: TAG_NAME
   description: The image tag name to pull for the deployment.
-  required: true 
-  value: dev 
+  required: true
 - name: IMAGE_REGISTRY_HOST
   description: The image tag name to pull for the deployment.
-  required: true 
-  value: 172.30.1.1    
+  required: true    
 - name: IMAGE_NAMESPACE
   description: The location for your image streams (Tools Workspace).
   required: true
@@ -138,8 +136,6 @@ parameters:
 - name: WEBAPI_URL
   description: The public URL that the API is exposed on.
   required: true
-  #value: my-route-my-project.127.0.0.1.nip.io  
 - name: WEBAPI_ALLOWED_ORIGINS
   description: The public URL that the API is exposed on.
   required: true
-  #value: "*,http://boat-tracker-web-myproject.172.26.10.84.nip.io/"  

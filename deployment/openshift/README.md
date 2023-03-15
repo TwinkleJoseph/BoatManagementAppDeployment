@@ -4,6 +4,9 @@
 oc process -f postgresql-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -    
 oc process -f postgresql-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -   
 
+1.b Deploy Postresql HA using Patroni image
+oc process -f ha/patroni-ha-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -
+
 2. Build web api        
 oc process -f webapi-bc.yaml | oc apply -f -
 

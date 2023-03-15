@@ -1,23 +1,30 @@
 # Openshift Build and Deployment steps
 
-1. Deploy PostgreSql database      
+1. Login to OpenShift oc command line
+
+oc login <OpenShift Server URL> --token=<Token>
+
+This command could be obtained from the OpenShift console. Copy the login command from your user profile.
+Click on developer/<your user> and Copy Login Command
+
+2. a Deploy PostgreSql database      
 oc process -f postgresql-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -    
 oc process -f postgresql-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -   
 
-1.b Deploy Postresql HA using Patroni image
+2.b Deploy Postresql HA using Patroni image
 oc process -f ha/patroni-ha-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -
 
-2. Build web api        
+3. Build web api        
 oc process -f webapi-bc.yaml | oc apply -f -
 
-3. Deploy web api
+4. Deploy web api
 oc process -f webapi-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -
 oc process -f webapi-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -
 
-4. Build react web app        
+5. Build react web app        
 oc process -f webapp-bc.yaml | oc apply -f -
 
-4. Deploy react web app
+6. Deploy react web app
 oc process -f webapp-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -
 oc process -f webapp-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -
 

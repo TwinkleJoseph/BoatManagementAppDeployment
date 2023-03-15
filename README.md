@@ -1,4 +1,4 @@
-# IS 27 DevOps Specialist Technical Assignment
+# Echo Coach Tours Boat Management Application Deployment
 
 # Sample Application    
 

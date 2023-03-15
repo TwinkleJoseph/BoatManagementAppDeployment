@@ -2,10 +2,10 @@
 
 1. Login to OpenShift oc command line
 
-oc login <OpenShift Server URL> --token=<Token>
+    ```oc login <OpenShift Server URL> --token=<Token>```
 
 This command could be obtained from the OpenShift console. Copy the login command from your user profile.
-Click on developer/<your user> and Copy Login Command
+Click on developer and Copy Login Command
 
 2. a Deploy PostgreSql database      
 oc process -f postgresql-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -    

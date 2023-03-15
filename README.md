@@ -18,7 +18,7 @@ Contact twinkleljoseph@gmail.com for login credentials.
 Please refer to the User Guide for detailed information on the setup.
 
 # Manual Deployment
-Instructions to deploy manually on an openshift cluster could be found in deployment\openshift\README.md.
+Instructions to deploy manually on an openshift cluster could be found in [Deployment Instructions]([deployment/openshift/README.md]).
 
 # Automated Deployment using GitHub Actions.
 GitHub Action workflow is created for the automated deployment of Openshift resources.

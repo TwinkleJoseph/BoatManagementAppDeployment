@@ -4,24 +4,29 @@
 
     ```oc login <OpenShift Server URL> --token=<Token>```
 
-This command could be obtained from the OpenShift console. Copy the login command from your user profile.
-Click on developer and Copy Login Command
+   This command could be obtained from the OpenShift console. Copy the login command from your user profile.
+   Click on developer and Copy Login Command
 
-2. a Deploy PostgreSql database      
+2. a Deploy PostgreSql database 
+
 ```oc process -f postgresql-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -```    
 ```oc process -f postgresql-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -```   
 
-2.b Deploy Postresql HA using Patroni image
+2.b Deploy Postresql HA using Patroni image 
+
 ```oc process -f ha/patroni-ha-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -```
 
-3. Build web api        
+3. Build web api    
+
 ```oc process -f webapi-bc.yaml | oc apply -f -```
 
-4. Deploy web api
+4. Deploy web api   
+
 ```oc process -f webapi-dc.yaml --param-file=dev.env --ignore-unknown-parameters=true | oc apply -f -```
 ```oc process -f webapi-dc.yaml --param-file=test.env --ignore-unknown-parameters=true | oc apply -f -```
 
-5. Build react web app        
+5. Build react web app  
+         
 ```oc process -f webapp-bc.yaml | oc apply -f -```
 
 6. Deploy react web app

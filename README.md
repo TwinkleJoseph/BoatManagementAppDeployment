@@ -2,20 +2,20 @@
 
 # Sample Application    
 
-This deployment configuration is intended to build and deploy a publically available
-application hosted in a github repo. For the purpose of this demonstration, I am using the sample application
-available in the following repo:
+This deployment configuration is intended to build and deploy a publicly available
+application hosted in a GitHub repository. For this demonstration, I am using the sample application
+available in the following repository:
 
 [https://github.com/TwinkleJoseph/EcoCoachToursBoatManagementApp]
 
-This application has a react.js front end, node.js back-end and postgresql database components. OpenShift build script will checkout the application from the above GitHub repo during build time and push images to the OpenShift image registry.
+This application has a react.js front end, node.js back-end and PostgreSQL  database components. OpenShift build script will checkout the application from the above GitHub repo during build time and push images to the OpenShift image registry.
 
 # Design Considerations 
 
 1. A sample application developed by me was chosen for the deployment. There is a front end, back-end and postgresql database for this application.
 2. Openshift cluster should be running front end, back-end and database in their own pods.
 3. Patroni is considered for making database Highly Available.
-4. Build and Deployment configurations for each components are maintained in seperate yaml files.
+4. Build and Deployment configurations for each components are maintained in separate manifest files.
 5. Secrets and Config Maps shall be used to keep sensitive information and environment specific configurations.
 
 # Decisions 

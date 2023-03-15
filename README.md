@@ -24,13 +24,13 @@ Instructions to deploy manually on an openshift cluster could be found in [Deplo
 GitHub Action workflow is created for the automated deployment of Openshift resources.
 A service account user has been created in OpenShift project for this. Please follow the steps below to configure service account token in GitHub.
 a. Login to OpenShift with the developer user 
- oc login <OpenShift Server URL> --token=<Token>
+ ```oc login <OpenShift Server URL> --token=<Token>```
 
 b. Enable the service account with required permissions to create cluster resources.
- oc create rolebinding github-sa-admin --clusterrole=admin --serviceaccount=myproject:github-sa -n myproject
+ ```oc create rolebinding github-sa-admin --clusterrole=admin --serviceaccount=myproject:github-sa -n myproject```
 
 c.  Get the service account token
- oc sa get-token github-sa -n myproject
+ ```oc sa get-token github-sa -n myproject```
 
 d. Login to GitHub and select project settings.
 
